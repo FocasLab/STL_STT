@@ -324,7 +324,7 @@ class STT_Solver():
     def set_z_finish(self, value):
         self._z_finish = value
 
-solver = STT_Solver(degree=16, dimension=2, time_step=0.5, min_tube_thickness=0.2, max_tube_thickness=0.5)
+solver = STT_Solver(degree=8, dimension=2, time_step=0.1, min_tube_thickness=0.2, max_tube_thickness=0.5)
 
 def reach(x1, x2, y1, y2, t1, t2):
     solver.setpoints.append([x1, x2, y1, y2, t1, t2])
@@ -401,11 +401,14 @@ start = time.time()
 S_constraints_list = reach(4, 5, 4, 5, 0, 1)
 T1_constraints_list = reach(8, 9, 14, 15, 3, 4)
 T2_constraints_list = reach(14, 15, 8, 9, 6, 7)
-T3_constraints_list = reach(8, 9, 14, 15, 9, 10)
-T4_constraints_list = reach(14, 15, 8, 9, 12, 13)
-G_constraints_list = reach(18, 19, 18, 19, 17, 18)
-O1_constraints_list = avoid(5, 7, 8, 10, 0, 20)
-O2_constraints_list = avoid(15, 17, 12, 14, 0, 20)
+# T3_constraints_list = reach(8, 9, 14, 15, 9, 10)
+# T4_constraints_list = reach(14, 15, 8, 9, 12, 13)
+# G_constraints_list = reach(18, 19, 18, 19, 17, 18)
+# O1_constraints_list = avoid(5, 7, 8, 10, 0, 20)
+# O2_constraints_list = avoid(15, 17, 12, 14, 0, 20)
+G_constraints_list = reach(18, 19, 18, 19, 9, 10)
+O1_constraints_list = avoid(5, 7, 8, 10, 0, 10)
+O2_constraints_list = avoid(15, 17, 12, 14, 0, 10)
 
 for S in S_constraints_list:
     solver.solver.add(S)
@@ -416,11 +419,11 @@ for T1 in T1_constraints_list:
 for T2 in T2_constraints_list:
     solver.solver.add(T2)
 
-for T3 in T3_constraints_list:
-    solver.solver.add(T3)
+# for T3 in T3_constraints_list:
+#     solver.solver.add(T3)
 
-for T4 in T4_constraints_list:
-    solver.solver.add(T4)
+# for T4 in T4_constraints_list:
+#     solver.solver.add(T4)
 
 for G in G_constraints_list:
     solver.solver.add(G)
