@@ -3,10 +3,8 @@ clear;
 clf;
 
 global cas
-
-for cas = 1:2
-
-t_span = linspace(0,15,150);
+cas = 31;
+t_span = linspace(0,14,150);
 
 %%
 rhoL = zeros(length(t_span),3);
@@ -17,24 +15,23 @@ for i=1:length(t_span)
     rhoU(i,:) = rU';
 end
 
-X_init = 0.5*(rhoL(1,:)+rhoU(1,:))';
+X_init = 0.5*(rhoL(1,:)+rhoU(1,:));
 % X = 0.5*(rhoL+rhoU);
 % t = t_span;
-options = odeset('RelTol',1e-3);
+options = odeset('RelTol',1e-5);
 tic
 [t, X] = ode45(@spacecraft, t_span, X_init, options);
 toc
-% X = 0.5*(rhoL+rhoU);
+
 %% Robustness
 T = [2.2, 1.6, 1.6];
 G = [2.8, 2.8, 2.8];
 d = 0.2;
 
 %% Plots
-t =t_span;
 figure(1)
 dim = 1;
-subplot(2,4,2 + (cas-1)*4)
+subplot(1,4,2)
 plot(t,rhoL(:,dim),t,rhoU(:,dim),'Linestyle','-.','Color',[0.1 0.1 0.9],'Linewidth',2); hold on;
 plot(t,X(:,dim),'-k','Linewidth',1.5);
 legend({'STTs','','System Trajectory'},'Fontsize',15,'Location','best')
@@ -46,7 +43,7 @@ ax.FontSize = 16;
 % ylim([0 5])
 
 dim = 2;
-subplot(2,4,3 + (cas-1)*4)
+subplot(1,4,3)
 plot(t,rhoL(:,dim),t,rhoU(:,dim),'Linestyle','-.','Color',[0.1 0.1 0.9],'Linewidth',2); hold on;
 plot(t,X(:,dim),'-k','Linewidth',1.5);
 legend({'STTs','','System Trajectory'},'Fontsize',15,'Location','best')
@@ -58,7 +55,7 @@ ax.FontSize = 16;
 % ylim([0 5])
 
 dim = 3;
-subplot(2,4,4 + (cas-1)*4)
+subplot(1,4,4)
 % plot(rob_arr)
 plot(t,rhoL(:,dim),t,rhoU(:,dim),'Linestyle','-.','Color',[0.1 0.1 0.9],'Linewidth',2); hold on;
 plot(t,X(:,dim),'-k','Linewidth',1.5);
@@ -70,7 +67,7 @@ ax = gca;
 ax.FontSize = 16;
 % ylim([0 5])
 
-subplot(2,4,1 + (cas-1)*4)
+subplot(1,4,1)
 s = 2;
 hold on;
 plotcube([0.6,0.6,0.6],[0,0,0],0.4,[0,0,1]); % start
@@ -92,7 +89,6 @@ ax = gca;
 ax.FontSize = 16;
 view([-15,11])
 
-end
 %% System Dynamics
 function dXdt = spacecraft(t, X)
     J1 = 200;
@@ -139,6 +135,7 @@ end
 %% Control Law
 function u = control(t,X)   
     % Funnel
+    % t
     [rhoL, rhoU] = tube(t); % interpolate value at t
     rho_a = rhoL + rhoU;
     rho_m = -rhoL + rhoU;
@@ -154,10 +151,8 @@ function u = control(t,X)
     Xi = diag(Xi_col);
     
     % Control Law
-    k = 1000;
+    k = 100;
     u = -k*Xi*eps;
-
-    u = real(u);
 end
 
 %% 2-Norm
@@ -208,7 +203,7 @@ if cas == 1
     C35 = -0.0001699023672777245;
     C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, ...
         C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35]/5;
-else
+elseif cas ==2
     C0 = -0.9947193621508238;
     C1 = 0.4277863285546202;
     C2 = 1.2140297298487956;
@@ -247,5 +242,8 @@ else
     C35 = -8.864906559813607e-05;
     C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, ...
         C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35]/5;
+else
+    M = readmatrix("Spacecraft.csv");
+    C = M(:,2);
 end
 end
