@@ -1,6 +1,7 @@
 #!/opt/homebrew/bin/python3.11
 '''script for `Rotating Rigid Spacecraft` example'''
 import z3
+import csv
 import time
 import random
 import numpy as np
@@ -24,7 +25,7 @@ class STT_Solver():
         self._y_finish = 0
         self._z_start = 0
         self._z_finish = 0
-        self.min_tube_thickness = min_tube_thickness
+        self.eta = min_tube_thickness
         self.max_tube_thickness = max_tube_thickness
         self.lambda_values = np.arange(0, 1.1, 0.1)
         self.degree = degree
@@ -97,9 +98,9 @@ class STT_Solver():
             gamma1_U = self.gammas(t)[3]
             gamma2_U = self.gammas(t)[4]
             gamma3_U = self.gammas(t)[5]
-            constraint_x = z3.And((gamma1_U - gamma1_L) > self.min_tube_thickness, (gamma1_U - gamma1_L) < self.max_tube_thickness)
-            constraint_y = z3.And((gamma2_U - gamma2_L) > self.min_tube_thickness, (gamma2_U - gamma2_L) < self.max_tube_thickness)
-            constraint_z = z3.And((gamma3_U - gamma3_L) > self.min_tube_thickness, (gamma3_U - gamma3_L) < self.max_tube_thickness)
+            constraint_x = z3.And((gamma1_U - gamma1_L) > self.eta, (gamma1_U - gamma1_L) < self.max_tube_thickness)
+            constraint_y = z3.And((gamma2_U - gamma2_L) > self.eta, (gamma2_U - gamma2_L) < self.max_tube_thickness)
+            constraint_z = z3.And((gamma3_U - gamma3_L) > self.eta, (gamma3_U - gamma3_L) < self.max_tube_thickness)
             self.solver.add(constraint_x)
             self.solver.add(constraint_y)
             self.solver.add(constraint_z)
@@ -231,6 +232,17 @@ class STT_Solver():
 
             for i in range(len(Coeffs)):
                 C_fin[i] = Coeffs[i]
+
+            fieldnames = ['Coefficient', 'Value']
+            data_dicts = []
+            for i in range(len(Coeffs)):
+                data_dicts.append({'Coefficient': self.C[i], 'Value': Coeffs[i]})
+
+            with open('Spacecraft.csv', 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                if file.tell() == 0:
+                    writer.writeheader()  # Write headers only if the file is empty
+                writer.writerows(data_dicts)
 
             if self.dimension == 1:
                 self.plot_for_1D(C_fin)

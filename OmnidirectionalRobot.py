@@ -1,6 +1,7 @@
 #!/opt/homebrew/bin/python3.11
 '''script for `Omnidirectional Robot` example'''
 import z3
+import csv
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,7 +25,7 @@ class STT_Solver():
         self._y_finish = 0
         self._z_start = 0
         self._z_finish = 0
-        self.min_tube_thickness = min_tube_thickness
+        self.eta = min_tube_thickness
         self.max_tube_thickness = max_tube_thickness
         self.lambda_values = np.arange(0, 1.1, 0.1)
         self.degree = degree
@@ -95,8 +96,8 @@ class STT_Solver():
             gamma2_L = self.gammas(t)[1]
             gamma1_U = self.gammas(t)[2]
             gamma2_U = self.gammas(t)[3]
-            constraint_x = z3.And((gamma1_U - gamma1_L) > self.min_tube_thickness, (gamma1_U - gamma1_L) < self.max_tube_thickness)
-            constraint_y = z3.And((gamma2_U - gamma2_L) > self.min_tube_thickness, (gamma2_U - gamma2_L) < self.max_tube_thickness)
+            constraint_x = z3.And((gamma1_U - gamma1_L) > self.eta, (gamma1_U - gamma1_L) < self.max_tube_thickness)
+            constraint_y = z3.And((gamma2_U - gamma2_L) > self.eta, (gamma2_U - gamma2_L) < self.max_tube_thickness)
             self.solver.add(constraint_x)
             self.solver.add(constraint_y)
 
@@ -204,6 +205,17 @@ class STT_Solver():
 
             for i in range(len(Coeffs)):
                 C_fin[i] = Coeffs[i]
+
+            fieldnames = ['Coefficient', 'Value']
+            data_dicts = []
+            for i in range(len(Coeffs)):
+                data_dicts.append({'Coefficient': self.C[i], 'Value': Coeffs[i]})
+
+            with open('Robot.csv', 'w', newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                if file.tell() == 0:
+                    writer.writeheader()  # Write headers only if the file is empty
+                writer.writerows(data_dicts)
 
             self.plot_for_2D(C_fin)
             self.print_equation(C_fin)
