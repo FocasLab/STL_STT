@@ -20,21 +20,15 @@ end
 X_init = 0.5*(rhoL(1,:)+rhoU(1,:))';
 % X = 0.5*(rhoL+rhoU);
 % t = t_span;
-options = odeset('RelTol',1e-2);
+options = odeset('RelTol',1e-3);
 tic
-X = 0.5*(rhoL+rhoU);
-% [t, X] = ode45(@spacecraft, t_span, X_init, options);
+[t, X] = ode45(@spacecraft, t_span, X_init, options);
 toc
-
+% X = 0.5*(rhoL+rhoU);
 %% Robustness
 T = [2.2, 1.6, 1.6];
 G = [2.8, 2.8, 2.8];
 d = 0.2;
-% rob_arr = [];
-% for i = 1:length(t)
-%     rob = max(d - norm(X(i,:)-T), d - norm(X(i,:)-G));
-%     rob_arr = [rob_arr, rob];
-% end
 
 %% Plots
 t =t_span;
@@ -101,9 +95,9 @@ view([-15,11])
 end
 %% System Dynamics
 function dXdt = spacecraft(t, X)
-    J1 = 1; %200;
-    J2 = 1; %200;
-    J3 = 1; %100;
+    J1 = 200;
+    J2 = 200;
+    J3 = 100;
     u = real(control(t,X));
     dx1 = (J2-J3)/J1*X(2)*X(3) + 1/J1*u(1);
     dx2 = (J3-J1)/J2*X(1)*X(3) + 1/J2*u(2);
@@ -115,7 +109,6 @@ end
 function [gamL, gamU] = tube(t)
 global cas
 C = C_val(cas);
-s = 0;
 for i=1:6
     c0 = C(6*i-5);
     c1 = C(6*i-4);
@@ -124,13 +117,13 @@ for i=1:6
     c4 = C(6*i-1);
     c5 = C(6*i);
     if i==1
-        gamma_Lx = s + c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
+        gamma_Lx = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
     elseif i==2
-        gamma_Ly = s + c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
+        gamma_Ly = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
     elseif i==3
-        gamma_Lz = s + c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
+        gamma_Lz = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
     elseif i==4
-        gamma_Ux = s + c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
+        gamma_Ux = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
     elseif i==5
         gamma_Uy = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
     else
@@ -161,7 +154,7 @@ function u = control(t,X)
     Xi = diag(Xi_col);
     
     % Control Law
-    k = 1;
+    k = 1000;
     u = -k*Xi*eps;
 
     u = real(u);
@@ -213,6 +206,8 @@ if cas == 1
     C33 = -0.058556349964849215;
     C34 = 0.0052465859553120706;
     C35 = -0.0001699023672777245;
+    C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, ...
+        C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35]/5;
 else
     C0 = -0.9947193621508238;
     C1 = 0.4277863285546202;
@@ -250,9 +245,7 @@ else
     C33 = -0.08099965733727106;
     C34 = 0.004422992408222249;
     C35 = -8.864906559813607e-05;
+    C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, ...
+        C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35]/5;
 end
-M = readmatrix("Spacecraft.csv");
-C = M(:,2);
-% C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, ...
-        % C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35];
 end
