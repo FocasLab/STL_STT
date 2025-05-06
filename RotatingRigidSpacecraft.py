@@ -372,7 +372,7 @@ class STT_Solver():
     def set_z_finish(self, value):
         self._z_finish = value
 
-solver = STT_Solver(degree=5, dimension=3, time_step=0.5, min_tube_thickness=0.31, max_tube_thickness=0.5)
+solver = STT_Solver(degree=5, dimension=3, time_step=0.5, min_tube_thickness=0.3, max_tube_thickness=0.5)
 
 def reach(x1, x2, y1, y2, z1, z2, t1, t2):
     solver.setpoints.append([x1, x2, y1, y2, z1, z2, t1, t2])
@@ -452,11 +452,12 @@ def avoid(x1, x2, y1, y2, z1, z2, t1, t2):
 
 start = time.time()
 
-S_constraints_list = reach(0.0, 0.6, 0.0, 0.6, 0.4, 1.0, 0, 1)
+S_constraints_list = reach(0.0, 0.6, 0.0, 0.6, 0.0, 0.5, 0, 1)
 T1_constraints_list = reach(2.0, 2.6, 1.4, 2.0, 1.4, 2.0, 7, 8)
 T2_constraints_list = reach(0.8, 1.4, 1.4, 2.0, 1.4, 2.0, 7, 8)
 G_constraints_list = reach(2.6, 3.2, 2.6, 3.2, 2.6, 3.2, 14, 15)
 O_constraints_list = avoid(1.4, 2.0, 1.4, 2.4, 0.0, 3.0, 0, 15)
+B_constraints_list = avoid(3.0, 0.0, 3.0, 0.0, 3.0, 0.0, 0, 15)
 
 for S in S_constraints_list:
     solver.solver.add(S)
@@ -477,6 +478,8 @@ for G in G_constraints_list:
 for O in O_constraints_list:
     solver.solver.add(O)
 
+for B in B_constraints_list:
+    solver.solver.add(B)
 solver.find_solution()
 
 # time step 0.5 generates instantly for both routes (via T1 and T2)

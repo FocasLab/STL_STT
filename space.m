@@ -20,22 +20,24 @@ end
 X_init = 0.5*(rhoL(1,:)+rhoU(1,:))';
 % X = 0.5*(rhoL+rhoU);
 % t = t_span;
-options = odeset('RelTol',1e-3);
+options = odeset('RelTol',1e-2);
 tic
-[t, X] = ode45(@spacecraft, t_span, X_init, options);
+X = 0.5*(rhoL+rhoU);
+% [t, X] = ode45(@spacecraft, t_span, X_init, options);
 toc
 
 %% Robustness
 T = [2.2, 1.6, 1.6];
 G = [2.8, 2.8, 2.8];
 d = 0.2;
-rob_arr = [];
-for i = 1:length(t)
-    rob = max(d - norm(X(i,:)-T), d - norm(X(i,:)-G));
-    rob_arr = [rob_arr, rob];
-end
+% rob_arr = [];
+% for i = 1:length(t)
+%     rob = max(d - norm(X(i,:)-T), d - norm(X(i,:)-G));
+%     rob_arr = [rob_arr, rob];
+% end
 
 %% Plots
+t =t_span;
 figure(1)
 dim = 1;
 subplot(2,4,2 + (cas-1)*4)
@@ -99,9 +101,9 @@ view([-15,11])
 end
 %% System Dynamics
 function dXdt = spacecraft(t, X)
-    J1 = 200;
-    J2 = 200;
-    J3 = 100;
+    J1 = 1; %200;
+    J2 = 1; %200;
+    J3 = 1; %100;
     u = real(control(t,X));
     dx1 = (J2-J3)/J1*X(2)*X(3) + 1/J1*u(1);
     dx2 = (J3-J1)/J2*X(1)*X(3) + 1/J2*u(2);
@@ -113,7 +115,7 @@ end
 function [gamL, gamU] = tube(t)
 global cas
 C = C_val(cas);
-s = 1;
+s = 0;
 for i=1:6
     c0 = C(6*i-5);
     c1 = C(6*i-4);
@@ -135,8 +137,10 @@ for i=1:6
         gamma_Uz = c0 + c1*t + c2*t^2 + c3*t^3 + c4*t^4 + c5*t^5;
     end
 end
-gamL = [gamma_Lx; gamma_Ly; gamma_Lz]/5;
-gamU = [gamma_Ux; gamma_Uy; gamma_Uz]/5;
+% gamL = [gamma_Lx; gamma_Ly; gamma_Lz]/5;
+% gamU = [gamma_Ux; gamma_Uy; gamma_Uz]/5;
+gamL = [gamma_Lx; gamma_Ly; gamma_Lz];
+gamU = [gamma_Ux; gamma_Uy; gamma_Uz];
 end
 
 %% Control Law
@@ -157,8 +161,10 @@ function u = control(t,X)
     Xi = diag(Xi_col);
     
     % Control Law
-    k = 10^3;
+    k = 1;
     u = -k*Xi*eps;
+
+    u = real(u);
 end
 
 %% 2-Norm
