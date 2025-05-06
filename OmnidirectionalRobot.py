@@ -324,7 +324,7 @@ class STT_Solver():
     def set_z_finish(self, value):
         self._z_finish = value
 
-solver = STT_Solver(degree=8, dimension=2, time_step=0.1, min_tube_thickness=0.2, max_tube_thickness=0.5)
+solver = STT_Solver(degree=8, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.5)
 
 def reach(x1, x2, y1, y2, t1, t2):
     solver.setpoints.append([x1, x2, y1, y2, t1, t2])
