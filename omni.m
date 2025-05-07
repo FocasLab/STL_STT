@@ -3,17 +3,15 @@ clear;
 clf;
 
 global C
-cas = 1;
+cas = 2;
 
 if cas == 1 
-    M = readmatrix("Robot1.csv");
-    C = M(:,2);
+    C = readmatrix("Robot1.csv");
 else
-    M = readmatrix("Robot.csv");
-    C = M(:,2);
+    C = readmatrix("Robot.csv");
 end
 
-t_span = linspace(0,18,1000);
+t_span = linspace(0.4,18,1000);
 
 %%
 rhoL = zeros(length(t_span),2);
@@ -27,10 +25,12 @@ end
 X_init = 0.5*(rhoL(1,:)+rhoU(1,:))';
 options = odeset('RelTol',1e-5);
 
-% tic
-% [t, X] = ode45(@spacecraft, t_span, X_init, options);
-% toc
+tic
+[t, X] = ode45(@spacecraft, t_span, X_init, options);
+toc
 
+% X = 0.5*(rhoL+rhoU);
+% t = t_span;
 
 %% Plots
 figure(1)
@@ -66,8 +66,6 @@ hold on;
 rectangle('Position', [4 4 1 1], 'FaceColor', [0,0,1,0.5],'EdgeColor','none', FaceAlpha=0.5) % Start
 rectangle('Position', [8 14 1 1], 'FaceColor', [0,1,0,0.5],'EdgeColor','none', FaceAlpha=0.5) % Target1
 rectangle('Position', [14 8 1 1], 'FaceColor', [0,1,0,0.5],'EdgeColor','none', FaceAlpha=0.5) % Target2
-% rectangle('Position', [5 6 4 4], 'FaceColor', [1,0,0,0.5],'EdgeColor','none', FaceAlpha=0.6) % Obstacle1
-% rectangle('Position', [15 12 4 4], 'FaceColor', [1,0,0,0.5],'EdgeColor','none', FaceAlpha=0.6) % Obstacle2
 rectangle('Position', [5 8 2 2], 'FaceColor', [1,0,0,0.5],'EdgeColor','none', FaceAlpha=0.6) % Obstacle1
 rectangle('Position', [15 12 2 2], 'FaceColor', [1,0,0,0.5],'EdgeColor','none', FaceAlpha=0.6) % Obstacle2
 rectangle('Position', [18 18 1 1], 'FaceColor', [0,1,0,0.5],'EdgeColor','none', FaceAlpha=0.8) % Goal
@@ -81,8 +79,6 @@ ylim([0,20])
 ax = gca;
 ax.FontSize = 16;
 axis square;
-% pause(0.01);
-% end
 
 %% System Dynamics
 function dXdt = spacecraft(t, X)
@@ -90,15 +86,6 @@ function dXdt = spacecraft(t, X)
     dx1 = u(1);
     dx2 = u(2);
     dXdt = [dx1; dx2];
-end
-
-%% Spatiotemporal Tubes
-function [gamL, gamU] = tube(t)
-
-[gamma_Lx, gamma_Ly, gamma_Ux, gamma_Uy] = evaluate_piecewise(t);
-
-gamL = [gamma_Lx; gamma_Ly];
-gamU = [gamma_Ux; gamma_Uy];
 end
 
 %% Control Law
@@ -123,95 +110,16 @@ function u = control(t,X)
     u = -k*Xi*eps;
 end
 
-%% 2-Norm
-function f = normTwo(a,b) 
-    x = a(1)-b(1);
-    y = a(2)-b(2);
-    f = sqrt(x^2+y^2);
-end
-
-%%
-function C = C_val()
-C0 = 0.43004072063185816;
-C1 = -10.20072082563844;
-C2 = 29.22494159777211;
-C3 = -18.64582996024464;
-C4 = 0.0;
-C5 = 5.317565819233522;
-C6 = -3.0781587059473305;
-C7 = 0.9582462787250223;
-C8 = -0.19498486660737038;
-C9 = 0.027683080746682395;
-C10 = -0.002815903275225475;
-C11 = 0.0002066633134179747;
-C12 = -1.0856791129733707e-05;
-C13 = 3.981782968289559e-07;
-C14 = -9.68205707533169e-09;
-C15 = 1.4025152394538742e-10;
-C16 = -9.161112189092483e-13;
-C17 = 0.03497963968407091;
-C18 = 18.73116193866058;
-C19 = -66.97044954830065;
-C20 = 77.56038024016016;
-C21 = -43.56572937919289;
-C22 = 14.3685364046494;
-C23 = -3.026252681375182;
-C24 = 0.41532106320930706;
-C25 = -0.035009388296682854;
-C26 = 0.001221590903197315;
-C27 = 9.288664649233638e-05;
-C28 = -1.608857890821893e-05;
-C29 = 1.1236760536401676e-06;
-C30 = -4.663205485859816e-08;
-C31 = 1.190085669698537e-09;
-C32 = -1.7325341909771985e-11;
-C33 = 1.1052720790909387e-13;
-C34 = 0.9650203603159291;
-C35 = -13.685797757913463;
-C36 = 42.7875717408059;
-C37 = -37.46959035139938;
-C38 = 14.164609393799356;
-C39 = -1.4429565690217043;
-C40 = -0.8675438859217939;
-C41 = 0.4416539503040718;
-C42 = -0.10663853066771725;
-C43 = 0.016491167008641373;
-C44 = -0.0017621467691667973;
-C45 = 0.00013329839675933563;
-C46 = -7.136462960347804e-06;
-C47 = 2.647825836704992e-07;
-C48 = -6.480607724453341e-09;
-C49 = 9.414969768816906e-11;
-C50 = -6.151224244217257e-13;
-C51 = 0.5699592793681418;
-C52 = 18.089270764721277;
-C53 = -63.93069257347069;
-C54 = 72.14597594904129;
-C55 = -38.65655002955938;
-C56 = 11.76233843601898;
-C57 = -2.1345590392662284;
-C58 = 0.20608871938311776;
-C59 = 0.0;
-C60 = -0.003052401466439201;
-C61 = 0.0004776411570769076;
-C62 = -4.162065673913837e-05;
-C63 = 2.3575310906119646e-06;
-C64 = -8.886111688326097e-08;
-C65 = 2.1599973962990686e-09;
-C66 = -3.0733102412884625e-11;
-C67 = 1.9483086057686067e-13;
-
-C = [C0, C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, ...
-        C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31, C32, C33, C34, C35, ...
-        C36, C37, C38, C39, C40, C41, C42, C43, C44, C45, C46, C47, C48, C49, C50, C51, C52, C53, C54, C55, ...
-        C46, C47, C48, C49, C50, C51, C52, C53, C54, C55, C56, C57, C58, C59, C60, C61, C62, C63, C64, C65, ...
-        C56, C57, C58, C59, C60, C61, C62, C63, C64, C65, C66, C67];
-end
-
-function [Lx, Ly, Ux, Uy] = evaluate_piecewise(t)
-    % Load piecewise coefficients from CSV
+%% Spatiotemporal Tubes
+function [gamL, gamU] = tube(t)
+    
     global C
-    Cpiece = C; %readmatrix('Robot1.csv');  % Each row is one of Lx, Ly, Ux, Uy
+    Cpiece = C; 
+
+    % If the coefficients are stored as a column vector, reshape
+    if size(Cpiece, 2) == 1 && mod(length(Cpiece), 4) == 0
+        Cpiece = reshape(Cpiece, [], 4)';  % Reshape to 4 x N
+    end
 
     % Piecewise breakpoints and polynomial degree
     breaks = [0 4 7 10 13 18];
@@ -222,11 +130,11 @@ function [Lx, Ly, Ux, Uy] = evaluate_piecewise(t)
     % Ensure t is a column vector
     t = t(:);
 
-    % Initialize outputs
-    Lx = zeros(size(t));
-    Ly = zeros(size(t));
-    Ux = zeros(size(t));
-    Uy = zeros(size(t));
+    % Initialize tube boundaries
+    gamma_Lx = zeros(size(t));
+    gamma_Ly = zeros(size(t));
+    gamma_Ux = zeros(size(t));
+    gamma_Uy = zeros(size(t));
 
     for k = 1:length(t)
         tk = t(k);
@@ -234,33 +142,35 @@ function [Lx, Ly, Ux, Uy] = evaluate_piecewise(t)
         % Clamp t to valid range
         if tk < breaks(1)
             tk = breaks(1);
-        elseif tk > breaks(end)
-            tk = breaks(end) - 1e-8;  % avoid boundary issue
+        elseif tk >= breaks(end)
+            tk = breaks(end) - 1e-8;
         end
 
-        % Find which segment tk belongs to
+        % Find segment
         seg_idx = find(breaks <= tk, 1, 'last');
         if seg_idx >= num_segments + 1
             seg_idx = num_segments;
         end
 
-        % Local time within segment
         t_local = tk - breaks(seg_idx);
 
-        % Get coefficients for each curve
+        % Evaluate each curve
         for curve = 1:4
             coefs = Cpiece(curve, (seg_idx-1)*coefs_per_seg + (1:coefs_per_seg));
             val = polyval(flip(coefs), t_local);
             switch curve
                 case 1
-                    Lx(k) = val;
+                    gamma_Lx(k) = val;
                 case 2
-                    Ux(k) = val;
+                    gamma_Ux(k) = val;
                 case 3
-                    Ly(k) = val;
+                    gamma_Ly(k) = val;
                 case 4
-                    Uy(k) = val;
+                    gamma_Uy(k) = val;
             end
         end
     end
+    gamL = [gamma_Lx; gamma_Ly];
+    gamU = [gamma_Ux; gamma_Uy];
 end
+
