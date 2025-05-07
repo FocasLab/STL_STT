@@ -27,10 +27,9 @@ end
 X_init = 0.5*(rhoL(1,:)+rhoU(1,:))';
 options = odeset('RelTol',1e-5);
 
-% tic
-% [t, X] = ode45(@spacecraft, t_span, X_init, options);
-% toc
-
+tic
+[t, X] = ode45(@spacecraft, t_span, X_init, options);
+toc
 
 %% Plots
 figure(1)
@@ -94,6 +93,8 @@ end
 
 %% Spatiotemporal Tubes
 function [gamL, gamU] = tube(t)
+
+global C
 
 [gamma_Lx, gamma_Ly, gamma_Ux, gamma_Uy] = evaluate_piecewise(t);
 
@@ -210,8 +211,7 @@ end
 
 function [Lx, Ly, Ux, Uy] = evaluate_piecewise(t)
     % Load piecewise coefficients from CSV
-    global C
-    Cpiece = C; %readmatrix('Robot1.csv');  % Each row is one of Lx, Ly, Ux, Uy
+    Cpiece = readmatrix('Robot1.csv');  % Each row is one of Lx, Ly, Ux, Uy
 
     % Piecewise breakpoints and polynomial degree
     breaks = [0 4 7 10 13 18];
