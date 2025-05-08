@@ -458,7 +458,7 @@ start = time.time()
 
 #---------- TUBE 1 ----------#
 # start time = 0
-solver1 = STT_Solver(degree=5, dimension=2, time_step=0.18, min_tube_thickness=0.32, max_tube_thickness=0.5)
+solver1 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
 
 S_constraints_list = reach(solver1, 4, 5, 4, 5, 0, 1)
 T1_constraints_list = reach(solver1, 8, 9, 14, 15, 3, 4)
@@ -474,7 +474,7 @@ tube1 = solver1.find_solution()
 
 #---------- TUBE 2 ----------#
 # start time = 4
-solver2 = STT_Solver(degree=5, dimension=2, time_step=0.18, min_tube_thickness=0.32, max_tube_thickness=0.5)
+solver2 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
 
 T1_constraints_list = reach(solver2, 8, 9, 14, 15, 0, 1) # time shift 3, 4
 T2_constraints_list = reach(solver2, 14, 15, 8, 9, 3, 4) # time shift 6, 7
@@ -491,7 +491,7 @@ tube2 = solver2.find_solution()
 
 #---------- TUBE 3 ----------#
 # start time = 7
-solver3 = STT_Solver(degree=5, dimension=2, time_step=0.28, min_tube_thickness=0.32, max_tube_thickness=0.5)
+solver3 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
 
 T2_constraints_list = reach(solver3, 14, 15, 8, 9, 0, 1) # time shift 6, 7
 T3_constraints_list = reach(solver3, 8, 9, 14, 15, 3, 4) # time shift 9, 10
@@ -508,7 +508,7 @@ tube3 = solver3.find_solution()
 
 #---------- TUBE 4 ----------#
 # start time = 10
-solver4 = STT_Solver(degree=5, dimension=2, time_step=0.18, min_tube_thickness=0.32, max_tube_thickness=0.5)
+solver4 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
 
 T3_constraints_list = reach(solver4, 8, 9, 14, 15, 0, 1) # time shift 9, 10
 T4_constraints_list = reach(solver4, 14, 15, 8, 9, 3, 4) # time shift 12, 13
@@ -525,7 +525,7 @@ tube4 = solver4.find_solution()
 
 #---------- TUBE 5 ----------#
 # start time = 13
-solver5 = STT_Solver(degree=5, dimension=2, time_step=0.28, min_tube_thickness=0.32, max_tube_thickness=0.5)
+solver5 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
 
 T4_constraints_list = reach(solver5, 14, 15, 8, 9, 0, 1)  # time shift 12, 13
 G_constraints_list = reach(solver5, 18, 19, 18, 19, 4, 5) # time shift 17, 18
