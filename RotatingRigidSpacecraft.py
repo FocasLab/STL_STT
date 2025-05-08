@@ -254,7 +254,7 @@ class STT_Solver():
 
             end = time.time()
             self.displayTime(start, end)
-            plt.show(block=True)
+            # plt.show(block=True)
 
         else:
             print("No solution found.")

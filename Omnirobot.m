@@ -3,7 +3,7 @@ clear;
 clf;
 
 global C
-cas = 2;
+cas = 1;
 
 if cas == 1 
     C = readmatrix("Robot1.csv");
@@ -11,7 +11,7 @@ else
     C = readmatrix("Robot.csv");
 end
 
-t_span = linspace(0.4,18,1000);
+t_span = linspace(0.4,180,1000);
 
 %%
 rhoL = zeros(length(t_span),2);
@@ -28,9 +28,6 @@ options = odeset('RelTol',1e-5);
 tic
 [t, X] = ode45(@spacecraft, t_span, X_init, options);
 toc
-
-% X = 0.5*(rhoL+rhoU);
-% t = t_span;
 
 %% Plots
 figure(1)
@@ -137,7 +134,7 @@ function [gamL, gamU] = tube(t)
     gamma_Uy = zeros(size(t));
 
     for k = 1:length(t)
-        tk = t(k);
+        tk = t(k)/10;
 
         % Clamp t to valid range
         if tk < breaks(1)
