@@ -6,8 +6,9 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from decimal import Decimal, getcontext
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-
+getcontext().prec = 50
 
 class STT_Solver():
     '''class for generating STT based on constraints on trajectory'''
@@ -199,7 +200,7 @@ class STT_Solver():
             Coeffs = []
             C_fin = np.zeros((2 * self.dimension) * (self.degree + 1))
             for i in range(len(self.C)):
-                xi[i] = (np.float64(model[self.C[i]].numerator().as_long()))/(np.float64(model[self.C[i]].denominator().as_long()))
+                xi[i] = float((Decimal(model[self.C[i]].numerator().as_long()))/(Decimal(model[self.C[i]].denominator().as_long())))
                 print("{} = {}".format(self.C[i], xi[i]))
                 Coeffs.append(xi[i])
 
@@ -211,24 +212,27 @@ class STT_Solver():
             for i in range(len(Coeffs)):
                 data_dicts.append({'Coefficient': self.C[i], 'Value': Coeffs[i]})
 
-            with open('Robot.csv', 'w', newline='') as file:
+            with open('Robot.csv', 'a', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 if file.tell() == 0:
-                    writer.writeheader()  # Write headers only if the file is empty
+                    writer.writeheader()
                 writer.writerows(data_dicts)
 
-            self.plot_for_2D(C_fin)
-            self.print_equation(C_fin)
+            self.plot_for_2D(Coeffs)
+            self.print_equation(Coeffs)
 
             end = time.time()
             self.displayTime(start, end)
-            plt.show(block=True)
+            plt.show()
 
         else:
+            Coeffs = []
             print("No solution found.")
             print("range: ", self.getRange(), "\nstart: ", self.getStart(), "\nfinish: ", self.getFinish(), "\nstep: ", self._step)
             end = time.time()
             self.displayTime(start, end)
+
+        return Coeffs
 
     def print_equation(self, C):
         for i in range(2 * self.dimension):
@@ -281,6 +285,34 @@ class STT_Solver():
         else:
             secs = k - (mins * 60) - (hrs * 3600) - (days * 24 * 3600)
         print("Time taken: ", days, "days, ", hrs , "hours, ", mins, "minutes, ", secs, "seconds")
+
+    def join_constraint(self, prev_tube, prev_degree, prev_t_end):
+        prev_gamma = np.zeros(2 * self.dimension)
+
+        for i in range(2 * self.dimension):
+            power = 0
+            for j in range(prev_degree + 1):
+                prev_gamma[i] += ((prev_tube[j + i * (prev_degree + 1)]) * (prev_t_end ** power))
+                power += 1
+
+        prev_gamma_dot = np.zeros(2 * self.dimension)
+
+        for i in range(2 * self.dimension):
+            power = 0
+            for j in range(prev_degree + 1):
+                if power < 1:
+                    prev_gamma_dot[i] += 0
+                    power += 1
+                else:
+                    prev_gamma_dot[i] += power * ((prev_tube[j + i * (prev_degree + 1)]) * (prev_t_end ** (power - 1)))
+                    power += 1
+
+        print("gamma: ", prev_gamma, self.gammas(prev_t_end)[0] == prev_gamma[0])
+        print("gamma_dot: ", prev_gamma_dot, self.gamma_dot(prev_t_end)[0])
+
+        for i in range(2 * self.dimension):
+            self.solver.add(self.gammas(prev_t_end)[i] == prev_gamma[i])
+            self.solver.add(self.gamma_dot(prev_t_end)[i] == prev_gamma_dot[i])
 
     def getStart(self):
         return self._start
@@ -336,9 +368,8 @@ class STT_Solver():
     def set_z_finish(self, value):
         self._z_finish = value
 
-solver = STT_Solver(degree=8, dimension=2, time_step=0.4, min_tube_thickness=0.32, max_tube_thickness=0.5)
 
-def reach(x1, x2, y1, y2, t1, t2):
+def reach(solver, x1, x2, y1, y2, t1, t2):
     solver.setpoints.append([x1, x2, y1, y2, t1, t2])
     all_constraints = []
     t_values = np.arange(t1, t2, solver._step)
@@ -367,7 +398,7 @@ def reach(x1, x2, y1, y2, t1, t2):
     solver.displayTime(start, end)
     return all_constraints
 
-def avoid(x1, x2, y1, y2, t1, t2):
+def avoid(solver, x1, x2, y1, y2, t1, t2):
     solver.obstacles.append([x1, x2, y1, y2, t1, t2])
     all_constraints = []
     t_values = np.arange(t1, t2, solver._step)
@@ -396,6 +427,11 @@ def avoid(x1, x2, y1, y2, t1, t2):
     solver.displayTime(start, end)
     return all_constraints
 
+# def plotter(*tubes):
+#     dimension = 2
+#     for tube in tubes:
+
+
 #------------------ SPECIFICATION -------------------#
 #         x1  x2    y1  y2        time
 # reach {(4 , 5)  ,(4 , 5) }    ] 0-1s
@@ -408,44 +444,100 @@ def avoid(x1, x2, y1, y2, t1, t2):
 # avoid {(15 , 17),(12 ,14)}    ] 0-20s
 #----------------------------------------------------#
 
+
 start = time.time()
 
-S_constraints_list = reach(4, 5, 4, 5, 0, 1)
-T1_constraints_list = reach(8, 9, 14, 15, 3, 4)
-T2_constraints_list = reach(14, 15, 8, 9, 6, 7)
+# S_constraints_list = reach(4, 5, 4, 5, 0, 1)
+# T1_constraints_list = reach(8, 9, 14, 15, 3, 4)
+# T2_constraints_list = reach(14, 15, 8, 9, 6, 7)
 # T3_constraints_list = reach(8, 9, 14, 15, 9, 10)
 # T4_constraints_list = reach(14, 15, 8, 9, 12, 13)
 # G_constraints_list = reach(18, 19, 18, 19, 17, 18)
 # O1_constraints_list = avoid(5, 7, 8, 10, 0, 20)
 # O2_constraints_list = avoid(15, 17, 12, 14, 0, 20)
-G_constraints_list = reach(18, 19, 18, 19, 9, 10)
-O1_constraints_list = avoid(5, 7, 8, 10, 0, 10)
-O2_constraints_list = avoid(15, 17, 12, 14, 0, 10)
+
+#---------- TUBE 1 ----------#
+# start time = 0
+solver1 = STT_Solver(degree=5, dimension=2, time_step=0.1, min_tube_thickness=0.32, max_tube_thickness=0.5)
+
+S_constraints_list = reach(solver1, 4, 5, 4, 5, 0, 1)
+T1_constraints_list = reach(solver1, 8, 9, 14, 15, 3, 4)
 
 for S in S_constraints_list:
-    solver.solver.add(S)
+    solver1.solver.add(S)
 
 for T1 in T1_constraints_list:
-    solver.solver.add(T1)
+    solver1.solver.add(T1)
+
+tube1 = solver1.find_solution()
+# end time = 4
+
+#---------- TUBE 2 ----------#
+# start time = 4
+solver2 = STT_Solver(degree=5, dimension=2, time_step=0.1, min_tube_thickness=0.32, max_tube_thickness=0.5)
+
+T1_constraints_list = reach(solver2, 8, 9, 14, 15, 0, 1) # time shift 3, 4
+T2_constraints_list = reach(solver2, 14, 15, 8, 9, 3, 4) # time shift 6, 7
+
+for T1 in T1_constraints_list:
+    solver2.solver.add(T1)
 
 for T2 in T2_constraints_list:
-    solver.solver.add(T2)
+    solver2.solver.add(T2)
 
-# for T3 in T3_constraints_list:
-#     solver.solver.add(T3)
+# solver2.join_constraint(tube1, prev_degree=5, prev_t_end=4)
+tube2 = solver2.find_solution()
+# end time = 7
 
-# for T4 in T4_constraints_list:
-#     solver.solver.add(T4)
+#---------- TUBE 3 ----------#
+# start time = 7
+solver3 = STT_Solver(degree=5, dimension=2, time_step=0.1, min_tube_thickness=0.32, max_tube_thickness=0.5)
+
+T2_constraints_list = reach(solver3, 14, 15, 8, 9, 0, 1) # time shift 6, 7
+T3_constraints_list = reach(solver3, 8, 9, 14, 15, 3, 4) # time shift 9, 10
+
+for T2 in T2_constraints_list:
+    solver3.solver.add(T2)
+
+for T3 in T3_constraints_list:
+    solver3.solver.add(T3)
+
+# solver3.join_constraint(tube2, prev_degree=5)
+tube3 = solver3.find_solution()
+# end time = 10
+
+#---------- TUBE 4 ----------#
+# start time = 10
+solver4 = STT_Solver(degree=5, dimension=2, time_step=0.1, min_tube_thickness=0.32, max_tube_thickness=0.5)
+
+T3_constraints_list = reach(solver4, 8, 9, 14, 15, 0, 1) # time shift 9, 10
+T4_constraints_list = reach(solver4, 14, 15, 8, 9, 3, 4) # time shift 12, 13
+
+for T3 in T3_constraints_list:
+    solver4.solver.add(T3)
+
+for T4 in T4_constraints_list:
+    solver4.solver.add(T4)
+
+# solver4.join_constraint(tube3, prev_degree=5)
+tube4 = solver4.find_solution()
+# end time = 13
+
+#---------- TUBE 5 ----------#
+# start time = 13
+solver5 = STT_Solver(degree=5, dimension=2, time_step=0.1, min_tube_thickness=0.32, max_tube_thickness=0.5)
+
+T4_constraints_list = reach(solver5, 14, 15, 8, 9, 0, 1)  # time shift 12, 13
+G_constraints_list = reach(solver5, 18, 19, 18, 19, 4, 5) # time shift 17, 18
+
+for T4 in T4_constraints_list:
+    solver5.solver.add(T4)
 
 for G in G_constraints_list:
-    solver.solver.add(G)
+    solver5.solver.add(G)
 
-for O1 in O1_constraints_list:
-    solver.solver.add(O1)
+# solver5.join_constraint(tube4, prev_degree=5)
+tube5 = solver5.find_solution()
+# end time = 18
 
-for O2 in O2_constraints_list:
-    solver.solver.add(O2)
-
-solver.find_solution()
-
-# around 20 mins
+# 32sec + 2min 43sec + 4min 17sec + 2min 43sec + 3min 13sec = 13min 28sec
