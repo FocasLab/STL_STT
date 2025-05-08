@@ -3,7 +3,7 @@ clear;
 clf;
 
 global C
-cas = 2;
+cas = 1;
 
 if cas == 1 
     C = readmatrix("Robot1.csv");

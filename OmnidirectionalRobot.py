@@ -223,7 +223,7 @@ class STT_Solver():
 
             end = time.time()
             self.displayTime(start, end)
-            # plt.show()
+            plt.show()
 
         else:
             Coeffs = []
