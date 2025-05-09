@@ -316,7 +316,7 @@ class STT_Solver():
             secs = (((end - start) * 10000) // 100) / 100
         else:
             secs = k - (mins * 60) - (hrs * 3600) - (days * 24 * 3600)
-        print("Time taken: ", days, "days, ", hrs , "hours, ", mins, "minutes, ", secs, "seconds")
+        # print("Time taken: ", days, "days, ", hrs , "hours, ", mins, "minutes, ", secs, "seconds")
 
     def getStart(self):
         return self._start
