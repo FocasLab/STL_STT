@@ -19,7 +19,9 @@ It includes two case studies:
 - `space.m`: Synthesizes the closed-form controller and simulates the spacecraft trajectory using the generated tube.
 - `plotcube.m`: Utility script for visualizing 3D tube structures.
 
-### Results
+### Data and Results
+- `Robot.csv`, `Robot1.csv`: Tube and trajectory data for the omnidirectional robot.
+- `Spacecraft.csv`, `Spacecraft1.csv`, `Spacecraft2.csv`: Tube and trajectory data for the spacecraft.
 - `Omni2.fig`, `Spacecraft_1.fig`: MATLAB figure files for visualizations.
 - `Omni2.png`, `Spacecraft_1.png`: Plots of the robot and spacecraft trajectories and STTs.
 
