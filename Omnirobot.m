@@ -3,14 +3,9 @@ clear;
 clf;
 
 global C
-cas = 1;
 
-if cas == 1 
-    C = readmatrix("Robot1.csv");
-else
-    M = readmatrix("Robot.csv");
-    C = M(:,2);
-end
+M = readmatrix("Robot1.csv");
+C = M(:,2);
 
 t_span = linspace(0.4,180,1000);
 

@@ -8,11 +8,8 @@ cas = 2;
 if cas == 1 
     M = readmatrix("Spacecraft1.csv");
     C = M(:,2);
-elseif cas ==2
-    M = readmatrix("Spacecraft2.csv");
-    C = M(:,2);
 else
-    M = readmatrix("Spacecraft.csv");
+    M = readmatrix("Spacecraft2.csv");
     C = M(:,2);
 end
 
