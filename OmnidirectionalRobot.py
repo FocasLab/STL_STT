@@ -212,11 +212,11 @@ class STT_Solver():
             for i in range(len(Coeffs)):
                 data_dicts.append({'Coefficient': self.C[i], 'Value': Coeffs[i]})
 
-            with open('Robot.csv', 'a', newline='') as file:
-                writer = csv.DictWriter(file, fieldnames=fieldnames)
-                if file.tell() == 0:
-                    writer.writeheader()
-                writer.writerows(data_dicts)
+            # with open('Robot.csv', 'a', newline='') as file:
+            #     writer = csv.DictWriter(file, fieldnames=fieldnames)
+            #     if file.tell() == 0:
+            #         writer.writeheader()
+            #     writer.writerows(data_dicts)
 
             self.plot_for_2D(Coeffs)
             self.print_equation(Coeffs)
@@ -374,6 +374,7 @@ def reach(solver, x1, x2, y1, y2, t1, t2):
     all_constraints = []
     t_values = np.arange(t1, t2, solver._step)
     lambda_low = 0
+    lambda_mid = 0.5
     lambda_high = 1
 
     for t in t_values:
@@ -387,6 +388,11 @@ def reach(solver, x1, x2, y1, y2, t1, t2):
         y_low = (lambda_low * gamma2_L + (1 - lambda_low) * gamma2_U)
         constraint_low = z3.And(x_low<x2, x_low>x1, y_low<y2, y_low>y1)
         all_constraints.append(constraint_low)
+
+        x_mid = (lambda_mid * gamma1_L + (1 - lambda_mid) * gamma1_U)
+        y_mid = (lambda_mid * gamma2_L + (1 - lambda_mid) * gamma2_U)
+        constraint_mid = z3.And(x_mid<x2, x_mid>x1, y_mid<y2, y_mid>y1)
+        all_constraints.append(constraint_mid)
 
         x_high = (lambda_high * gamma1_L + (1 - lambda_high) * gamma1_U)
         y_high = (lambda_high * gamma2_L + (1 - lambda_high) * gamma2_U)
@@ -403,6 +409,7 @@ def avoid(solver, x1, x2, y1, y2, t1, t2):
     all_constraints = []
     t_values = np.arange(t1, t2, solver._step)
     lambda_low = 0
+    lambda_mid = 0.5
     lambda_high = 1
 
     for t in t_values:
@@ -416,6 +423,11 @@ def avoid(solver, x1, x2, y1, y2, t1, t2):
         y_low = (lambda_low * gamma2_L + (1 - lambda_low) * gamma2_U)
         constraint_low = z3.Or(z3.Or(x_low>x2, x_low<x1), z3.Or(y_low>y2, y_low<y1))
         all_constraints.append(constraint_low)
+
+        x_mid = (lambda_mid * gamma1_L + (1 - lambda_mid) * gamma1_U)
+        y_mid = (lambda_mid * gamma2_L + (1 - lambda_mid) * gamma2_U)
+        constraint_mid = z3.Or(z3.Or(x_mid>x2, x_mid<x1), z3.Or(y_mid>y2, y_mid<y1))
+        all_constraints.append(constraint_mid)
 
         x_high = (lambda_high * gamma1_L + (1 - lambda_high) * gamma1_U)
         y_high = (lambda_high * gamma2_L + (1 - lambda_high) * gamma2_U)

@@ -238,11 +238,11 @@ class STT_Solver():
             for i in range(len(Coeffs)):
                 data_dicts.append({'Coefficient': self.C[i], 'Value': Coeffs[i]})
 
-            with open('Spacecraft.csv', 'w', newline='') as file:
-                writer = csv.DictWriter(file, fieldnames=fieldnames)
-                if file.tell() == 0:
-                    writer.writeheader()  # Write headers only if the file is empty
-                writer.writerows(data_dicts)
+            # with open('Spacecraft.csv', 'w', newline='') as file:
+            #     writer = csv.DictWriter(file, fieldnames=fieldnames)
+            #     if file.tell() == 0:
+            #         writer.writeheader()  # Write headers only if the file is empty
+            #     writer.writerows(data_dicts)
 
             if self.dimension == 1:
                 self.plot_for_1D(C_fin)
