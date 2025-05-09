@@ -379,6 +379,7 @@ def reach(x1, x2, y1, y2, z1, z2, t1, t2):
     all_constraints = []
     t_values = np.arange(t1, t2, solver._step)
     lambda_low = 0
+    lambda_mid = 0.5
     lambda_high = 1
 
     for t in t_values:
@@ -396,6 +397,12 @@ def reach(x1, x2, y1, y2, z1, z2, t1, t2):
         constraint_low = z3.And(x_low<x2, x_low>x1, y_low<y2, y_low>y1, z_low<z2, z_low>z1)
         all_constraints.append(constraint_low)
 
+        x_mid = (lambda_mid * gamma1_L + (1 - lambda_mid) * gamma1_U)
+        y_mid = (lambda_mid * gamma2_L + (1 - lambda_mid) * gamma2_U)
+        z_mid = (lambda_mid * gamma3_L + (1 - lambda_mid) * gamma3_U)
+        constraint_mid = z3.And(x_mid<x2, x_mid>x1, y_mid<y2, y_mid>y1, z_mid<z2, z_mid>z1)
+        all_constraints.append(constraint_mid)
+
         x_high = (lambda_high * gamma1_L + (1 - lambda_high) * gamma1_U)
         y_high = (lambda_high * gamma2_L + (1 - lambda_high) * gamma2_U)
         z_high = (lambda_high * gamma3_L + (1 - lambda_high) * gamma3_U)
@@ -412,6 +419,7 @@ def avoid(x1, x2, y1, y2, z1, z2, t1, t2):
     all_constraints = []
     t_values = np.arange(t1, t2, solver._step)
     lambda_low = 0
+    lambda_mid = 0.5
     lambda_high = 1
 
     for t in t_values:
@@ -428,6 +436,12 @@ def avoid(x1, x2, y1, y2, z1, z2, t1, t2):
         z_low = (lambda_low * gamma3_L + (1 - lambda_low) * gamma3_U)
         constraint_low = z3.Or(z3.Or(x_low>x2, x_low<x1), z3.Or(y_low>y2, y_low<y1), z3.Or(z_low>z2, z_low<z1))
         all_constraints.append(constraint_low)
+
+        x_mid = (lambda_mid * gamma1_L + (1 - lambda_mid) * gamma1_U)
+        y_mid = (lambda_mid * gamma2_L + (1 - lambda_mid) * gamma2_U)
+        z_mid = (lambda_mid * gamma3_L + (1 - lambda_mid) * gamma3_U)
+        constraint_mid = z3.Or(z3.Or(x_mid>x2, x_mid<x1), z3.Or(y_mid>y2, y_mid<y1), z3.Or(z_mid>z2, z_mid<z1))
+        all_constraints.append(constraint_mid)
 
         x_high = (lambda_high * gamma1_L + (1 - lambda_high) * gamma1_U)
         y_high = (lambda_high * gamma2_L + (1 - lambda_high) * gamma2_U)

@@ -223,7 +223,7 @@ class STT_Solver():
 
             end = time.time()
             self.displayTime(start, end)
-            plt.show()
+            # plt.show()
 
         else:
             Coeffs = []
@@ -458,7 +458,7 @@ start = time.time()
 
 #---------- TUBE 1 ----------#
 # start time = 0
-solver1 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
+solver1 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.42, max_tube_thickness=0.45)
 
 S_constraints_list = reach(solver1, 4, 5, 4, 5, 0, 1)
 T1_constraints_list = reach(solver1, 8, 9, 14, 15, 3, 4)
@@ -469,12 +469,25 @@ for S in S_constraints_list:
 for T1 in T1_constraints_list:
     solver1.solver.add(T1)
 
+O1_constraints_list = avoid(solver1, 5, 7, 8, 10, 0, 4)
+O2_constraints_list = avoid(solver1, 15, 17, 12, 14, 0, 4)
+B_constraints_list = avoid(solver1, 20, 0, 20, 0, 0, 4)
+
+for O1 in O1_constraints_list:
+    solver1.solver.add(O1)
+
+for O2 in O2_constraints_list:
+    solver1.solver.add(O2)
+
+for B in B_constraints_list:
+    solver1.solver.add(B)
+
 tube1 = solver1.find_solution()
 # end time = 4
 
 #---------- TUBE 2 ----------#
 # start time = 4
-solver2 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
+solver2 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.42, max_tube_thickness=0.45)
 
 T1_constraints_list = reach(solver2, 8, 9, 14, 15, 0, 1) # time shift 3, 4
 T2_constraints_list = reach(solver2, 14, 15, 8, 9, 3, 4) # time shift 6, 7
@@ -485,13 +498,26 @@ for T1 in T1_constraints_list:
 for T2 in T2_constraints_list:
     solver2.solver.add(T2)
 
+O1_constraints_list = avoid(solver2, 5, 7, 8, 10, 0, 4)
+O2_constraints_list = avoid(solver2, 15, 17, 12, 14, 0, 4)
+B_constraints_list = avoid(solver2, 20, 0, 20, 0, 0, 4)
+
+for O1 in O1_constraints_list:
+    solver2.solver.add(O1)
+
+for O2 in O2_constraints_list:
+    solver2.solver.add(O2)
+    
+for B in B_constraints_list:
+    solver2.solver.add(B)
+
 # solver2.join_constraint(tube1, prev_degree=5, prev_t_end=4)
 tube2 = solver2.find_solution()
 # end time = 7
 
 #---------- TUBE 3 ----------#
 # start time = 7
-solver3 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
+solver3 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.42, max_tube_thickness=0.45)
 
 T2_constraints_list = reach(solver3, 14, 15, 8, 9, 0, 1) # time shift 6, 7
 T3_constraints_list = reach(solver3, 8, 9, 14, 15, 3, 4) # time shift 9, 10
@@ -502,13 +528,26 @@ for T2 in T2_constraints_list:
 for T3 in T3_constraints_list:
     solver3.solver.add(T3)
 
+O1_constraints_list = avoid(solver3, 5, 7, 8, 10, 0, 4)
+O2_constraints_list = avoid(solver3, 15, 17, 12, 14, 0, 4)
+B_constraints_list = avoid(solver3, 20, 0, 20, 0, 0, 4)
+
+for O1 in O1_constraints_list:
+    solver3.solver.add(O1)
+
+for O2 in O2_constraints_list:
+    solver3.solver.add(O2)
+    
+for B in B_constraints_list:
+    solver3.solver.add(B)
+
 # solver3.join_constraint(tube2, prev_degree=5)
 tube3 = solver3.find_solution()
 # end time = 10
 
 #---------- TUBE 4 ----------#
 # start time = 10
-solver4 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
+solver4 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.42, max_tube_thickness=0.45)
 
 T3_constraints_list = reach(solver4, 8, 9, 14, 15, 0, 1) # time shift 9, 10
 T4_constraints_list = reach(solver4, 14, 15, 8, 9, 3, 4) # time shift 12, 13
@@ -519,13 +558,26 @@ for T3 in T3_constraints_list:
 for T4 in T4_constraints_list:
     solver4.solver.add(T4)
 
+O1_constraints_list = avoid(solver4, 5, 7, 8, 10, 0, 4)
+O2_constraints_list = avoid(solver4, 15, 17, 12, 14, 0, 4)
+B_constraints_list = avoid(solver4, 20, 0, 20, 0, 0, 4)
+
+for O1 in O1_constraints_list:
+    solver4.solver.add(O1)
+
+for O2 in O2_constraints_list:
+    solver4.solver.add(O2)
+    
+for B in B_constraints_list:
+    solver4.solver.add(B)
+
 # solver4.join_constraint(tube3, prev_degree=5)
 tube4 = solver4.find_solution()
 # end time = 13
 
 #---------- TUBE 5 ----------#
 # start time = 13
-solver5 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.32, max_tube_thickness=0.35)
+solver5 = STT_Solver(degree=5, dimension=2, time_step=0.5, min_tube_thickness=0.42, max_tube_thickness=0.45)
 
 T4_constraints_list = reach(solver5, 14, 15, 8, 9, 0, 1)  # time shift 12, 13
 G_constraints_list = reach(solver5, 18, 19, 18, 19, 4, 5) # time shift 17, 18
@@ -535,6 +587,19 @@ for T4 in T4_constraints_list:
 
 for G in G_constraints_list:
     solver5.solver.add(G)
+
+O1_constraints_list = avoid(solver5, 5, 7, 8, 10, 0, 4)
+O2_constraints_list = avoid(solver5, 15, 17, 12, 14, 0, 4)
+B_constraints_list = avoid(solver5, 20, 0, 20, 0, 0, 4)
+
+for O1 in O1_constraints_list:
+    solver5.solver.add(O1)
+
+for O2 in O2_constraints_list:
+    solver5.solver.add(O2)
+    
+for B in B_constraints_list:
+    solver5.solver.add(B)
 
 # solver5.join_constraint(tube4, prev_degree=5)
 tube5 = solver5.find_solution()

@@ -93,9 +93,9 @@ ylabel('$x_2$ (rad)','interpreter','Latex','Fontsize',16,'Fontweight','bold')
 zlabel('$x_2$ (rad)','interpreter','Latex','Fontsize',16,'Fontweight','bold')
 grid on;
 box on;
-xlim([0,4])
-ylim([0,4])
-zlim([0,3])
+% xlim([0,4])
+% ylim([0,4])
+% zlim([0,3])
 ax = gca;
 ax.FontSize = 16;
 view([-15,11])
