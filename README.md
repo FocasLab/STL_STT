@@ -49,7 +49,3 @@ If you use this code in your research, please cite the following paper:
   journal={arXiv preprint arXiv:2505.05323},
   year={2024}
 }
-
-## License
-
-This project is released under the MIT License.
